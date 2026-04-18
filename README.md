@@ -2,6 +2,66 @@
 
 REST API en PHP puro (sin framework) para exponer catálogo, detalle y comparación de productos, pensada como challenge técnico con foco en capas, manejo de errores y calidad de código.
 
+## Estructura de carpetas
+
+Vista de la raíz del proyecto (sin `vendor/` de Composer, sin `.git/`, caché de PHPUnit ni el log en `logs/`; esas rutas se generan o instalan en el entorno).
+
+```
+.
+├── .gitignore
+├── .htaccess
+├── LICENSE
+├── README.md
+├── bootstrap.php
+├── composer.json
+├── composer.lock
+├── index.php
+├── phpunit.xml
+├── data/
+│   ├── categorias.json
+│   ├── listas_de_precios.json
+│   ├── monedas.json
+│   ├── precios.json
+│   ├── productos.json
+│   └── productos_detalle.json
+├── docs/
+│   ├── .htaccess
+│   ├── index.html
+│   └── openapi.yaml
+├── postman/
+│   └── Product_Comparison_API.postman_collection.json
+├── src/
+│   ├── Controllers/
+│   │   └── ProductController.php
+│   ├── Exceptions/
+│   │   └── ApiException.php
+│   ├── Http/
+│   │   └── RequestPath.php
+│   ├── Logger/
+│   │   └── Logger.php
+│   ├── Models/
+│   │   ├── Category.php
+│   │   ├── Currency.php
+│   │   ├── Price.php
+│   │   ├── PriceList.php
+│   │   ├── Product.php
+│   │   └── ProductDetail.php
+│   ├── Repositories/
+│   │   └── ProductRepository.php
+│   ├── Router/
+│   │   └── Router.php
+│   └── Services/
+│       └── ProductService.php
+└── tests/
+    └── ProductServiceTest.php
+```
+
+- **`data/`**: persistencia mock (JSON) consumida por el repositorio.
+- **`src/`**: aplicación (capas alineadas con [Arquitectura (N-Tier)](#arquitectura-n-tier)).
+- **`docs/`**: OpenAPI y Swagger UI.
+- **`postman/`**: colección para probar la API.
+- **`tests/`**: pruebas PHPUnit (servicio; datos en `data/`).
+
 ## Arquitectura (N-Tier)
 
 Flujo: **Router → Controller → Service → Repository → Model**
