@@ -1,0 +1,14 @@
+[
+  { "id": 1,  "fk_producto": 1, "fk_lista_de_precios": 1, "precio": 1299999.00 },
+  { "id": 2,  "fk_producto": 1, "fk_lista_de_precios": 2, "precio": 1238.00 },
+  { "id": 3,  "fk_producto": 2, "fk_lista_de_precios": 1, "precio": 1599999.00 },
+  { "id": 4,  "fk_producto": 2, "fk_lista_de_precios": 2, "precio": 1523.00 },
+  { "id": 5,  "fk_producto": 3, "fk_lista_de_precios": 1, "precio": 2199999.00 },
+  { "id": 6,  "fk_producto": 3, "fk_lista_de_precios": 2, "precio": 2095.00 },
+  { "id": 7,  "fk_producto": 4, "fk_lista_de_precios": 1, "precio": 1899999.00 },
+  { "id": 8,  "fk_producto": 4, "fk_lista_de_precios": 2, "precio": 1809.00 },
+  { "id": 9,  "fk_producto": 5, "fk_lista_de_precios": 1, "precio": 499999.00 },
+  { "id": 10, "fk_producto": 5, "fk_lista_de_precios": 2, "precio": 476.00 },
+  { "id": 11, "fk_producto": 6, "fk_lista_de_precios": 1, "precio": 599999.00 },
+  { "id": 12, "fk_producto": 6, "fk_lista_de_precios": 2, "precio": 571.00 }
+]

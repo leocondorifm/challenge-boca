@@ -1,0 +1,4 @@
+[
+  { "id": 1, "descripcion": "Lista General ARS", "fecha_vigencia": "2026-01-01", "estado": true, "fk_moneda": 1 },
+  { "id": 2, "descripcion": "Lista General USD", "fecha_vigencia": "2026-01-01", "estado": true, "fk_moneda": 2 }
+]

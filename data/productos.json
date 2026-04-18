@@ -1,0 +1,8 @@
+[
+  { "id": 1, "fk_categoria": 1, "nombre": "Samsung Galaxy S24",  "descripcion": "Smartphone flagship de Samsung", "estado": true },
+  { "id": 2, "fk_categoria": 1, "nombre": "iPhone 15 Pro",       "descripcion": "Smartphone flagship de Apple",   "estado": true },
+  { "id": 3, "fk_categoria": 2, "nombre": "MacBook Air M3",      "descripcion": "Laptop ultradelgada de Apple",   "estado": true },
+  { "id": 4, "fk_categoria": 2, "nombre": "Dell XPS 13",         "descripcion": "Laptop premium de Dell",         "estado": true },
+  { "id": 5, "fk_categoria": 3, "nombre": "Sony WH-1000XM5",    "descripcion": "Auriculares noise cancelling",   "estado": true },
+  { "id": 6, "fk_categoria": 3, "nombre": "AirPods Pro 2",       "descripcion": "Auriculares premium de Apple",   "estado": true }
+]

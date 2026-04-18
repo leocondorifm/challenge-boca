@@ -1,0 +1,369 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Product Comparison API",
+    "description": "API REST PHP — productos, categorías y comparación.\n\n**Servidor**\n- Embebido: `php -S localhost:8000 index.php` → `baseUrl` = `http://localhost:8000`\n- XAMPP en subcarpeta: `baseUrl` = `http://localhost/meli` (el router normaliza el prefijo)\n\n**Lista de precios**\n- Query opcional `lista_de_precios_id` en listado, detalle y compare (con `precio`).\n- Seed: `1` = ARS, `2` = USD.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List products (ARS default)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            },
+            "description": "Precio desde lista ARS por defecto. `precio.lista_de_precios_id` indica la lista usada."
+          }
+        },
+        {
+          "name": "List products — explicit USD list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products?lista_de_precios_id=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "lista_de_precios_id",
+                  "value": "2",
+                  "description": "Lista activa; moneda inferida (USD en seed)"
+                }
+              ]
+            },
+            "description": "Fuerza la lista 2: importes y `moneda`/`simbolo` en USD."
+          }
+        },
+        {
+          "name": "List products by category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products?categoria_id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "categoria_id",
+                  "value": "1",
+                  "description": "1=Smartphones, 2=Laptops, 3=Auriculares"
+                }
+              ]
+            },
+            "description": "Filtro por categoría (precio sigue siendo ARS default salvo que agregues lista_de_precios_id)."
+          }
+        },
+        {
+          "name": "Get product — ARS default (no query)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1"]
+            },
+            "description": "Sin `moneda` ni lista: ARS + primera lista ARS activa."
+          }
+        },
+        {
+          "name": "Get product — moneda=USD",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1?moneda=USD",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1"],
+              "query": [
+                {
+                  "key": "moneda",
+                  "value": "USD"
+                }
+              ]
+            },
+            "description": "Primera lista USD activa."
+          }
+        },
+        {
+          "name": "Get product — lista USD only (sin moneda)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1?lista_de_precios_id=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1"],
+              "query": [
+                {
+                  "key": "lista_de_precios_id",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "Moneda inferida de la lista (USD). No hace falta `moneda`."
+          }
+        },
+        {
+          "name": "Get product — lista + moneda consistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1?lista_de_precios_id=2&moneda=USD",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1"],
+              "query": [
+                {
+                  "key": "lista_de_precios_id",
+                  "value": "2"
+                },
+                {
+                  "key": "moneda",
+                  "value": "USD"
+                }
+              ]
+            },
+            "description": "`moneda` debe coincidir con la moneda de la lista."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Compare",
+      "item": [
+        {
+          "name": "Compare — all fields (ARS precio)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/compare?ids=1,2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "compare"],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1,2",
+                  "description": "Mínimo 2, máximo 4 IDs"
+                }
+              ]
+            },
+            "description": "Incluye `lista_de_precios_id` en data cuando hay fila `precio`."
+          }
+        },
+        {
+          "name": "Compare — precio con lista USD",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/compare?ids=1,2&campos=precio&lista_de_precios_id=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "compare"],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1,2"
+                },
+                {
+                  "key": "campos",
+                  "value": "precio"
+                },
+                {
+                  "key": "lista_de_precios_id",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "`lista_de_precios_id` en la respuesta será 2; importes en USD."
+          }
+        },
+        {
+          "name": "Compare — field filter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/compare?ids=1,2&campos=marca,camara,precio,bateria",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "compare"],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1,2"
+                },
+                {
+                  "key": "campos",
+                  "value": "marca,camara,precio,bateria"
+                }
+              ]
+            },
+            "description": "Sparse fieldset."
+          }
+        },
+        {
+          "name": "Compare — 4 products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/compare?ids=1,2,3,4&campos=marca,precio",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "compare"],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1,2,3,4"
+                },
+                {
+                  "key": "campos",
+                  "value": "marca,precio"
+                }
+              ]
+            },
+            "description": "Máximo 4 IDs."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories"]
+            },
+            "description": "Categorías activas."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Errors (examples)",
+      "item": [
+        {
+          "name": "404 — product not found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/99",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "99"]
+            },
+            "description": "Producto inexistente o inactivo."
+          }
+        },
+        {
+          "name": "400 — lista vs moneda inconsistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1?lista_de_precios_id=2&moneda=ARS",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1"],
+              "query": [
+                {
+                  "key": "lista_de_precios_id",
+                  "value": "2"
+                },
+                {
+                  "key": "moneda",
+                  "value": "ARS"
+                }
+              ]
+            },
+            "description": "Lista 2 es USD; `moneda=ARS` → 400 `lista_de_precios_id does not match moneda`."
+          }
+        },
+        {
+          "name": "400 — compare needs ids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/compare",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "compare"]
+            },
+            "description": "Sin `ids`."
+          }
+        },
+        {
+          "name": "400 — compare too few ids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/compare?ids=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "compare"],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Menos de 2 IDs."
+          }
+        },
+        {
+          "name": "404 — compare unknown id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/compare?ids=1,99",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "compare"],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1,99"
+                }
+              ]
+            },
+            "description": "ID inexistente/inactivo."
+          }
+        },
+        {
+          "name": "404 — unknown route",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/unknown",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "unknown"]
+            },
+            "description": "Ruta no definida."
+          }
+        }
+      ]
+    }
+  ]
+}

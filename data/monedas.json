@@ -1,0 +1,4 @@
+[
+  { "id": 1, "descripcion": "Peso Argentino",  "simbolo": "ARS", "cotizacion": 1.00,    "estado": true },
+  { "id": 2, "descripcion": "Dólar Americano", "simbolo": "USD", "cotizacion": 1050.00, "estado": true }
+]

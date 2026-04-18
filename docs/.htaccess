@@ -1,0 +1,8 @@
+# Con carpeta /docs/ física, Apache sirve esto antes del front controller. Evitamos
+# "Index of" y mostramos la UI de Swagger; el YAML y este index son estáticos.
+<IfModule mod_dir.c>
+    DirectoryIndex index.html
+</IfModule>
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>

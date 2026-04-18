@@ -1,0 +1,261 @@
+openapi: 3.0.3
+info:
+  title: Product Comparison API
+  description: |
+    API REST en PHP puro: catálogo, detalle EAV, comparación y precios multilista.
+    Misma lógica que en README: `lista_de_precios_id` opcional para fijar la lista de precios
+    (moneda inferida de la lista). Con `?moneda=` en el detalle, si también enviás `lista_de_precios_id` deben ser coherentes.
+  version: "1.0.0"
+
+servers:
+  - url: "http://localhost:8000"
+    description: PHP embebido (php -S con index.php como router)
+  - url: "http://localhost/meli"
+    description: XAMPP (subcarpeta; el router reescribe al mismo index.php)
+  - url: "{baseUrl}"
+    description: Sustituí el host
+    variables:
+      baseUrl:
+        default: "http://localhost:8000"
+        description: Incluía `/meli` u otra base si aplica
+
+tags:
+  - name: Products
+    description: Catálogo y ficha
+  - name: Compare
+    description: Comparación (EAV + precio)
+  - name: Categories
+  - name: Meta
+    description: Documentación OpenAPI
+
+paths:
+  /api/products:
+    get:
+      tags: [Products]
+      summary: Listar productos activos
+      parameters:
+        - $ref: "#/components/parameters/categoriaId"
+        - $ref: "#/components/parameters/listaDePreciosId"
+      responses:
+        "200":
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnvelopeListProducts"
+        default:
+          $ref: "#/components/responses/Error"
+  /api/products/{id}:
+    get:
+      tags: [Products]
+      summary: Detalle con especificaciones EAV
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1, example: 1 }
+        - $ref: "#/components/parameters/moneda"
+        - $ref: "#/components/parameters/listaDePreciosId"
+      responses:
+        "200":
+          description: Ficha
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnvelopeOneProduct"
+        "404":
+          $ref: "#/components/responses/Error404"
+        "400":
+          $ref: "#/components/responses/Error400"
+        default:
+          $ref: "#/components/responses/Error"
+  /api/products/compare:
+    get:
+      tags: [Compare]
+      summary: Comparar 2 a 4 productos
+      parameters:
+        - name: ids
+          in: query
+          required: true
+          description: "IDs separados por coma (mínimo 2, máximo 4, sin duplicar)"
+          schema: { type: string, example: "1,2" }
+        - name: campos
+          in: query
+          required: false
+          description: "Sparse fieldset: claves EAV + `precio` (orden respeta el listado)"
+          schema: { type: string, example: "marca,camara,precio" }
+        - $ref: "#/components/parameters/listaDePreciosId"
+      responses:
+        "200":
+          description: Objeto de comparación
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnvelopeCompare"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "404":
+          $ref: "#/components/responses/Error404"
+        default:
+          $ref: "#/components/responses/Error"
+  /api/categories:
+    get:
+      tags: [Categories]
+      summary: Listar categorías activas
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnvelopeCategories"
+        default:
+          $ref: "#/components/responses/Error"
+  /docs/openapi.yaml:
+    get:
+      tags: [Meta]
+      summary: Especificación OpenAPI 3.0
+      description: "Archivo en disco, servido como estático (Apache/PHP) — no pasa por `index.php`."
+      responses:
+        "200":
+          description: YAML
+          content:
+            application/yaml: { schema: { type: string, format: binary } }
+  /docs/:
+    get:
+      tags: [Meta]
+      summary: Interfaz Swagger UI (index.html)
+      description: "Carpeta física `docs/`; `index.html` carga la spec vía `openapi.yaml` (ruta relativa). En XAMPP, sin esto, Apache listaba el directorio."
+      responses:
+        "200":
+          content:
+            text/html: { schema: { type: string } }
+
+components:
+  parameters:
+    categoriaId:
+      name: categoria_id
+      in: query
+      required: false
+      schema: { type: integer, minimum: 1, example: 1 }
+    moneda:
+      name: moneda
+      in: query
+      required: false
+      description: "ARS o USD. Si se omite, ARS, salvo que fijes `lista_de_precios_id` (moneda = la de la lista)"
+      schema: { type: string, enum: [ARS, USD], example: USD }
+    listaDePreciosId:
+      name: lista_de_precios_id
+      in: query
+      required: false
+      description: "Lista de precios activa; la moneda del `precio` se infiere. En el detalle, `moneda` (si se envía) debe coincidir con la de la lista."
+      schema: { type: integer, minimum: 1, example: 2 }
+
+  responses:
+    Error:
+      description: Error genérico
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Error400:
+      description: Parámetros inválidos
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Error404:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [success, error]
+      properties:
+        success: { const: false }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: integer, example: 400 }
+            message: { type: string }
+    EnvelopeListProducts:
+      type: object
+      required: [success, data]
+      properties:
+        success: { const: true }
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/ListProduct" }
+    EnvelopeOneProduct:
+      type: object
+      required: [success, data]
+      properties:
+        success: { const: true }
+        data: { $ref: "#/components/schemas/ProductDetail" }
+    EnvelopeCompare:
+      type: object
+      required: [success, data]
+      properties:
+        success: { const: true }
+        data: { $ref: "#/components/schemas/CompareData" }
+    EnvelopeCategories:
+      type: object
+      required: [success, data]
+      properties:
+        success: { const: true }
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/CategoryItem" }
+    Precio:
+      type: object
+      required: [valor, moneda, simbolo, lista_de_precios_id]
+      properties:
+        valor: { type: number, example: 1299999.0 }
+        moneda: { type: string, example: "ARS" }
+        simbolo: { type: string, example: "$" }
+        lista_de_precios_id: { type: integer, example: 1 }
+    ListProduct:
+      type: object
+      required: [id, nombre, descripcion, categoria, precio]
+      properties:
+        id: { type: integer, example: 1 }
+        nombre: { type: string }
+        descripcion: { type: string }
+        categoria: { type: string }
+        precio: { $ref: "#/components/schemas/Precio" }
+    ProductDetail:
+      type: object
+      required: [id, nombre, descripcion, categoria, precio, especificaciones]
+      properties:
+        id: { type: integer }
+        nombre: { type: string }
+        descripcion: { type: string }
+        categoria: { type: string }
+        precio: { $ref: "#/components/schemas/Precio" }
+        especificaciones:
+          type: object
+          additionalProperties: { type: string }
+    CompareData:
+      type: object
+      required: [productos, comparacion]
+      properties:
+        productos:
+          type: array
+          items: { type: string }
+        lista_de_precios_id:
+          type: integer
+          description: "Presente solo si la fila `precio` figura en `comparacion` (lista usada para esos importes)"
+        comparacion:
+          type: object
+          description: "Filas: claves de atributo. Valores: objeto cuyas keys son id de producto (string) y el valor EAV, número en `precio` o null."
+          additionalProperties:
+            type: object
+            additionalProperties: true
+    CategoryItem:
+      type: object
+      required: [id, nombre, descripcion, estado]
+      properties:
+        id: { type: integer }
+        nombre: { type: string }
+        descripcion: { type: string }
+        estado: { type: boolean }

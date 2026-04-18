@@ -1,0 +1,5 @@
+[
+  { "id": 1, "nombre": "Smartphones",  "descripcion": "Teléfonos inteligentes",  "estado": true },
+  { "id": 2, "nombre": "Laptops",      "descripcion": "Computadoras portátiles", "estado": true },
+  { "id": 3, "nombre": "Auriculares",  "descripcion": "Auriculares y headsets",  "estado": true }
+]
